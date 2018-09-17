@@ -1,41 +1,50 @@
-import React from 'react';
+import React, { Component } from 'react';
 
 import FruitBasket from './FruitBasket';
-import FilteredFruitList from './FilteredFruitList';
 
-class App extends React.Component {
-  constructor (props) {
-    super(props)
+class App extends Component {
+  constructor() {
+    super();
 
     this.state = {
-      fruit: [],
-      filters: [],
       currentFilter: null,
-      items: []
-    }
+      filters: [],
+      fruit: []
+    };
   }
 
   componentDidMount() {
-    this.updateFilteredFruitList();
+    this.fetchFilters();
+    this.fetchFruit();
   }
 
-  toggleListMode = () => this.setState({ currentFilter: !this.state.currentFilter });
-
-  updateFilteredFruitList = () => {
-    fetch(`/api/fruit?filter=${this.state.currentFilter}`)
+  fetchFilters = () => {
+    fetch('/api/fruit_types')
       .then(response => response.json())
-      .then(items => this.setState({ items }));
+      .then(filters => this.setState({ filters }));
+  }
+
+  fetchFruit = () => {
+    fetch('/api/fruit')
+      .then(response => response.json())
+      .then(fruit => this.setState({ fruit }));
+  }
+
+  updateFilter = event => {
+    console.log('update filter to: ', event.target.value);
+    this.setState({ currentFilter: event.target.value });
   }
 
   render() {
-    return(
-      <div>
-        <FruitBasket />
-        <FilteredFruitList list={this.state.items} />
-      </div>
-    )
+    return (
+      <FruitBasket
+        fruit={this.state.fruit}
+        filters={this.state.filters}
+        currentFilter={this.state.currentFilter}
+        onUpdateFilter={this.updateFilter}
+      />
+    );
   }
 }
-//const App = () => <FruitBasket />;
 
 export default App;
